@@ -266,11 +266,7 @@ These values are used to decide which dependent attributes should be included in
 
 The smoke test checks that the CoP mechanism can be constructed and used to perturb a small dummy dataset.
 
-Run:
-
-```bash
-python scripts/run_cop_smoke_test.py
-```
+Run $test.ipnb$.
 
 The smoke test performs the following steps:
 
@@ -281,47 +277,22 @@ The smoke test performs the following steps:
 5. initializes the CoP mechanism;
 6. perturbs each record using a chosen privacy budget;
 7. writes the perturbed outputs to the `results/` directory.
-
+8. Evaluate MSE.
+9. Plot MSE vs Privacy budget.
+   
 Expected output:
 
-```text
-[OK] Loaded dummy data
-[OK] Built CoP mechanism
-[OK] Generated perturbed outputs
-[OK] Saved results to results/cop_smoke_test_outputs.csv
-```
-
-Expected output file:
-
-```text
-results/cop_smoke_test_outputs.csv
-```
+Graph of MSE vs Privacy budget.
 
 ## 10. Running the Perturbation Pipeline
 
-To run the CoP perturbation pipeline on prepared data, use:
-
-```bash
-python scripts/run_cop_perturbation.py
-```
-
-## 11. Limitations
-
-The artifact has the following limitations.
-
-1. The smoke test uses dummy data and is intended only to verify functionality.
-2. Full paper-scale reproduction is outside the scope of this artifact.
-3. Exact perturbed outputs are randomized and may vary across runs.
-4. Runtime increases with the number of attributes, alphabet sizes, and dependency pairs.
-5. Raw third-party datasets are not redistributed unless their licenses permit redistribution.
-
-## 12. License
+## 11. License
 
 The source code is released under the Apache License 2.0.
 
 Datasets are subject to their original licenses. If raw datasets cannot be redistributed, the repository provides instructions for preparing compatible input files.
 
-## 13. Contact
+## 12. Contact
 
 For questions about this artifact, contact:
 
