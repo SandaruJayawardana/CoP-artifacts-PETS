@@ -266,7 +266,7 @@ These values are used to decide which dependent attributes should be included in
 
 The smoke test checks that the CoP mechanism can be constructed and used to perturb a small dummy dataset.
 
-Run $test.ipnb$.
+Run $test.ipynb$.
 
 The smoke test performs the following steps:
 
