@@ -63,7 +63,7 @@ class CoP_Mechanism(Privacy_Mechanism):
             self.mechanism_dict[xk] = {}
             xk_alphabets = self.alphabet_dict[xk]
             alpha = (1/len(xk_alphabets))*self.ALPHA
-            print("xk ", xk, xk_alphabets)
+            # print("xk ", xk, xk_alphabets)
             for xk_alphabet_index, xk_alphabet in enumerate(xk_alphabets):
                 self.mechanism_dict[xk][xk_alphabet] = []
 
@@ -90,7 +90,7 @@ class CoP_Mechanism(Privacy_Mechanism):
                                 is_dist_preserve=True, ALPHA=alpha, cache_on=True)
                         self.mechanism_dict[xk][xk_alphabet].append((z, max_cmf, mechanism))
                         node_count += 1
-        print("node_count ", node_count)
+        # print("node_count ", node_count)
         
         for index_xk, xk in enumerate(self.ordered_attribute_list):
             states = self.alphabet_dict[xk]
@@ -109,9 +109,7 @@ class CoP_Mechanism(Privacy_Mechanism):
                 self.mechanism_dict[key_1][key_2] = sorted(self.mechanism_dict[key_1][key_2], key=lambda x: x[1], reverse=True)
                 # print(self.mechanism_dict[key_1][key_2])
 
-        for attr in self.ordered_attribute_list:
-            print(attr, self.mechanism_dict[attr])
-            
+
 
     def get_mechanism(self):
         if self.mechanism_list == []:
@@ -165,4 +163,4 @@ class CoP_Mechanism(Privacy_Mechanism):
         return np.sum(input_probability * np.sum(self.get_mechanism(eps) * self.normalized_objective_err_matrix, axis= 1))
 
     def get_name(self):
-        return "CPM"
+        return "CoP"
