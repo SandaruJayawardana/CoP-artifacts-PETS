@@ -157,7 +157,7 @@ scipy
 cvxpy
 highspy
 matplotlib
-jupyter
+scikit-learn
 ```
 
 Install dependencies using:
