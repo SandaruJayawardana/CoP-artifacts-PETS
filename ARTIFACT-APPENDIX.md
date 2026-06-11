@@ -284,15 +284,13 @@ Expected output:
 
 Graph of MSE vs Privacy budget.
 
-## 10. Running the Perturbation Pipeline
-
-## 11. License
+## 10. License
 
 The source code is released under the Apache License 2.0.
 
 Datasets are subject to their original licenses. If raw datasets cannot be redistributed, the repository provides instructions for preparing compatible input files.
 
-## 12. Contact
+## 11. Contact
 
 For questions about this artifact, contact:
 
