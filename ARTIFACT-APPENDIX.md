@@ -310,7 +310,7 @@ cop_mechanism = CoP_Mechanism(
 )
 ```
 
-## 9. Running the Smoke Test
+## 9. Running the Smoke Test (Execution time: ~2mins)
 
 The smoke test checks that the CoP mechanism can be constructed and used to perturb a small dummy dataset. It also validates the generated perturbed datasets and evaluates their utility.
 
