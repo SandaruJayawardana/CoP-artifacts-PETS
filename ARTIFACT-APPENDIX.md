@@ -167,6 +167,9 @@ cvxpy
 highspy
 matplotlib
 scikit-learn
+jupyter 
+nbconvert 
+ipykernel
 ```
 
 Install dependencies using:
@@ -396,7 +399,7 @@ Expected output:
 Perturbed datasets are generated, validated, and evaluated successfully.
 ```
 
-When plotting is enabled, the expected plot is:
+The expected plot is:
 
 ```text
 MSE vs Privacy Budget
