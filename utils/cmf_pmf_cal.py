@@ -1,6 +1,5 @@
 import numpy as np
 import pickle
-import os
 from pathlib import Path
 
 CURRENT_DIR = Path.cwd()
