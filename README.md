@@ -223,7 +223,7 @@ Run the container interactively:
 docker run --rm -it cop-artifact
 ```
 
-Alternatively, to open the example notebook in a browser using Jupyter, run:
+Alternatively, to open the example notebook in a browser using Jupyter, run (without running `docker run --rm -it cop-artifact`):
 
 ```bash
 docker run --rm -it \
@@ -342,7 +342,7 @@ jupyter nbconvert \
 
 ### 9.2 Run with Docker
 
-After building the Docker image, execute the notebook inside Docker using:
+After building the Docker image (without running `docker run --rm -it cop-artifact`), execute the notebook inside Docker using:
 
 ```bash
 docker run --rm -it \
