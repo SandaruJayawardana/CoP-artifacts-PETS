@@ -45,7 +45,6 @@ The artifact does not include:
 The repository is organized as follows.
 
 ```text
-.
 ├── ARTIFACT-APPENDIX.md
 ├── README.md
 ├── LICENSE
@@ -57,9 +56,25 @@ The repository is organized as follows.
 │       ├── cop_multithread.py
 │       ├── optimized_rr.py
 │       └── convex_optimizer.py
+├── notebooks/
+│   ├── cop_dummy_pipeline.ipynb
 ├── datasets/
 │   └── dummy.csv
-└── results/
+├── results/
+│   └── .gitkeep
+└── utils/
+    ├── __init__.py
+    ├── cmf_pmf_cal.py
+    ├── data_perturb.py
+    ├── eval_perturbed.py
+    ├── mi_compute.py
+    ├── mutual_information.py
+    ├── normalize_error_matrix.py
+    ├── pcc_compute.py
+    ├── per_attribute_privacy_budget_compute.py
+    ├── pmi_cal.py
+    ├── theoretical_privacy_leakage.py
+    └── util_functions.py
 ```
 
 ## 4. Main Components

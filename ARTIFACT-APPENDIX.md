@@ -14,7 +14,7 @@
 
 This artifact provides the implementation of the **CoP perturbation pipeline** proposed in the paper.
 
-The purpose of this artifact is to allow reviewers to inspect and execute the main perturbation mechanism. The artifact focuses on:
+The artifact focuses on:
 
 1. constructing CoP perturbation mechanisms from empirical dependency information;
 2. generating locally perturbed outputs under a given privacy budget;
@@ -45,7 +45,6 @@ The artifact does not include:
 The repository is organized as follows.
 
 ```text
-.
 ├── ARTIFACT-APPENDIX.md
 ├── README.md
 ├── LICENSE
@@ -54,18 +53,28 @@ The repository is organized as follows.
 │   ├── privacy_mechanism.py
 │   └── CoP/
 │       ├── cop.py
-│       ├── cop_multi_thread.py
+│       ├── cop_multithread.py
 │       ├── optimized_rr.py
 │       └── convex_optimizer.py
 ├── notebooks/
-│   └── cop_perturb.ipynb
-├── scripts/
-│   ├── run_cop_smoke_test.py
-│   └── run_cop_perturbation.py
+│   ├── cop_dummy_pipeline.ipynb
 ├── datasets/
-│   └── dummy/
-└── results/
-    └── dummy/
+│   └── dummy.csv
+├── results/
+│   └── .gitkeep
+└── utils/
+    ├── __init__.py
+    ├── cmf_pmf_cal.py
+    ├── data_perturb.py
+    ├── eval_perturbed.py
+    ├── mi_compute.py
+    ├── mutual_information.py
+    ├── normalize_error_matrix.py
+    ├── pcc_compute.py
+    ├── per_attribute_privacy_budget_compute.py
+    ├── pmi_cal.py
+    ├── theoretical_privacy_leakage.py
+    └── util_functions.py
 ```
 
 ## 4. Main Components
@@ -170,6 +179,10 @@ The artifact uses CVXPY with the HiGHS solver for the optimization step.
 
 ## 7. Installation
 
+The artifact can be installed either using a local Python virtual environment or using Docker.
+
+### 7.1 Option A: Local Installation
+
 Clone the repository:
 
 ```bash
@@ -177,112 +190,217 @@ git clone https://github.com/SandaruJayawardana/CoP-artifacts-PETS
 cd CoP-artifacts-PETS
 ```
 
-Create a virtual environment:
+Create and activate a virtual environment:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install dependencies:
+Install the required dependencies:
 
 ```bash
-pip install --upgrade pip
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
+
+### 7.2 Option B: Docker Installation
+
+We also provide a Dockerfile to support a reproducible build environment for artifact evaluation. The Docker image installs the required Python dependencies, notebook execution tools, and HiGHS solver support.
+
+Build the Docker image from the repository root:
+
+```bash
+docker build -t cop-artifact .
+```
+
+Run the container interactively:
+
+```bash
+docker run --rm -it cop-artifact
+```
+
+Alternatively, to open the example notebook in a browser using Jupyter, run:
+
+```bash
+docker run --rm -it \
+  -p 8888:8888 \
+  -v "$PWD:/artifact" \
+  -w /artifact \
+  cop-artifact \
+  jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --notebook-dir=/artifact
+```
+
+Then open the Jupyter URL printed in the terminal and navigate to:
+
+```text
+notebooks/cop_dummy_pipeline.ipynb
+```
+
+The volume mount `-v "$PWD:/artifact"` connects the local repository folder to `/artifact` inside Docker. Therefore, any results written to `/artifact/results/` inside Docker will also appear in the local `results/` folder.
 
 ## 8. Input Format
 
-The CoP perturbation pipeline requires the following inputs.
+The CoP perturbation pipeline requires a multidimensional categorical dataset. Each row corresponds to one user record, and each column corresponds to one attribute.
 
-### 8.1 Attribute list
+For the provided smoke test, the input dataset is:
 
-A list specifying the order of attributes:
+```text
+datasets/dummy.csv
+```
+
+The notebook automatically loads the dataset, extracts the attribute list, estimates dependency information, initializes the CoP mechanism, and evaluates the perturbed outputs.
+
+### 8.1 Attribute List
+
+The attribute list specifies the order of attributes used by the mechanism. In the smoke-test notebook, this list is obtained directly from the input dataset:
+
+```python
+COLUMNS = data.columns.to_list()
+```
+
+For example, if the dataset contains three attributes, the attribute list may be:
 
 ```python
 ordered_attribute_list = ["A", "B", "C"]
 ```
 
-### 8.2 Attribute alphabets
+The order of attributes is important because input records and perturbed output records follow this same order.
 
-A dictionary specifying the possible values of each attribute:
+### 8.2 Attribute Alphabets
 
-```python
-alphabet_dict = {
-    "A": ["0", "1"],
-    "B": ["0", "1"],
-    "C": ["0", "1"]
-}
-```
-
-### 8.3 Conditional mass functions
-
-A dictionary containing conditional distributions for attribute pairs:
+The alphabet of an attribute is the set of possible values that the attribute can take. The smoke-test notebook estimates the attribute alphabets from the dataset:
 
 ```python
-CMF_dict = {
-    "A B": np.array([[0.8, 0.2], [0.3, 0.7]]),
-    "A C": np.array([[0.6, 0.4], [0.4, 0.6]]),
-    "B A": np.array([[0.7, 0.3], [0.2, 0.8]]),
-    "B C": np.array([[0.5, 0.5], [0.4, 0.6]]),
-    "C A": np.array([[0.6, 0.4], [0.5, 0.5]]),
-    "C B": np.array([[0.7, 0.3], [0.3, 0.7]])
-}
+CMF_dict, alphabet_dict = get_cmf_pmf_dict_with_alphabet(
+    data=data,
+    is_pmf=False
+)
 ```
 
-Each key has the form:
+Here, `alphabet_dict` maps each attribute to its possible values.
 
-```text
-"source_attribute target_attribute"
-```
+### 8.3 Dependency Information
 
-### 8.4 Dependency scores
-
-The mechanism also uses dependency scores such as PMI and MI:
+CoP uses prior dependency information to coordinate perturbation across attributes. In the smoke-test notebook, this information is estimated from the input data:
 
 ```python
-pmi_dict = {
-    "A B": np.array([[0.9, 0.1], [0.2, 0.8]]),
-    "A C": np.array([[0.7, 0.3], [0.3, 0.7]]),
-    "B A": np.array([[0.8, 0.2], [0.2, 0.8]]),
-    "B C": np.array([[0.5, 0.5], [0.4, 0.6]]),
-    "C A": np.array([[0.6, 0.4], [0.5, 0.5]]),
-    "C B": np.array([[0.7, 0.3], [0.3, 0.7]])
-}
-
-mi_dict = {
-    "A B": 0.5,
-    "A C": 0.4,
-    "B A": 0.5,
-    "B C": 0.3,
-    "C A": 0.4,
-    "C B": 0.3
-}
+mi_dict = get_mi_dict(data=data, COLUMNS=COLUMNS)
+PMI_dict = get_pmi_dict(data=data)
 ```
 
-These values are used to decide which dependent attributes should be included in the coordinated perturbation process.
+The conditional probability matrices are stored in:
+
+```python
+CMF_dict
+```
+
+These dependency statistics are then passed to the CoP mechanism:
+
+```python
+cop_mechanism = CoP_Mechanism(
+    ordered_attribute_list=COLUMNS,
+    alphabet_dict=alphabet_dict,
+    CMF_dict=CMF_dict,
+    pmi_dict=PMI_dict,
+    mi_dict=mi_dict
+)
+```
 
 ## 9. Running the Smoke Test
 
-The smoke test checks that the CoP mechanism can be constructed and used to perturb a small dummy dataset.
+The smoke test checks that the CoP mechanism can be constructed and used to perturb a small dummy dataset. It also validates the generated perturbed datasets and evaluates their utility.
 
-Run $test.ipynb$.
+The smoke-test notebook is located at:
+
+```text
+notebooks/cop_dummy_pipeline.ipynb
+```
+
+### 9.1 Run Locally
+
+After completing the local installation, run:
+
+```bash
+jupyter notebook notebooks/cop_dummy_pipeline.ipynb
+```
+
+Then execute all cells in the notebook.
+
+Alternatively, the notebook can be executed from the command line:
+
+```bash
+jupyter nbconvert \
+  --to notebook \
+  --execute notebooks/cop_dummy_pipeline.ipynb \
+  --output executed_cop_dummy_pipeline.ipynb \
+  --output-dir results
+```
+
+### 9.2 Run with Docker
+
+After building the Docker image, execute the notebook inside Docker using:
+
+```bash
+docker run --rm -it \
+  -v "$PWD:/artifact" \
+  -w /artifact \
+  cop-artifact \
+  jupyter nbconvert \
+  --to notebook \
+  --execute notebooks/cop_dummy_pipeline.ipynb \
+  --output executed_cop_dummy_pipeline.ipynb \
+  --output-dir results
+```
+
+This command writes the executed notebook and generated outputs to the local `results/` directory.
+
+### 9.3 Smoke-Test Steps
 
 The smoke test performs the following steps:
 
-1. loads or creates a small dummy dataset;
-2. defines attribute alphabets;
-3. constructs dummy conditional mass functions;
-4. constructs dependency-score dictionaries;
-5. initializes the CoP mechanism;
-6. perturbs each record using a chosen privacy budget;
-7. writes the perturbed outputs to the `results/` directory.
-8. Evaluate MSE.
-9. Plot MSE vs Privacy budget.
-   
+1. loads the dummy dataset from `datasets/dummy.csv`;
+2. removes missing values, if any;
+3. extracts the ordered attribute list;
+4. estimates attribute alphabets and conditional probability matrices;
+5. computes mutual information and pointwise mutual information dictionaries;
+6. initializes the CoP mechanism;
+7. perturbs the dataset under multiple privacy budgets;
+8. saves the perturbed outputs to the `results/` directory;
+9. validates that the perturbed datasets have the expected format;
+10. evaluates the perturbed datasets against the original data.
+
+### 9.4 Expected Outputs
+
+After successful execution, the `results/` directory should contain perturbed datasets such as:
+
+```text
+dummy_perturbed_eps_1.csv.zip
+dummy_perturbed_eps_2.csv.zip
+dummy_perturbed_eps_4.csv.zip
+dummy_perturbed_eps_10.csv.zip
+dummy_perturbed_eps_15.csv.zip
+```
+
+If the notebook is executed using `nbconvert`, the following file is also created:
+
+```text
+executed_cop_dummy_pipeline.ipynb
+```
+
+The notebook also reports the evaluation results generated by `Evaluate_Perturbed_Data`. Depending on the evaluation configuration, this may include utility-error values such as MSE and corresponding plots over different privacy budgets.
+
 Expected output:
 
-Graph of MSE vs Privacy budget.
+```text
+Perturbed datasets are generated, validated, and evaluated successfully.
+```
+
+When plotting is enabled, the expected plot is:
+
+```text
+MSE vs Privacy Budget
+```
 
 ## 10. License
 
