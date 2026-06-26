@@ -1,7 +1,7 @@
-import numpy as np
+
+from mechanisms.CoP.convex_optimizer import *
 from mechanisms.privacy_mechanism import *
 from utils.util_functions import validate_alphabet, validate_distribution, validate_err_matrix
-from mechanisms.CPM.convex_optimiser import *
 
 class Optimized_Randomized_Response(Privacy_Mechanism):
     
@@ -30,7 +30,6 @@ class Optimized_Randomized_Response(Privacy_Mechanism):
     def get_mechanism(self, eps):
         if self.cache_on:
             try:
-                # print("Cache hit")
                 return self.__mechanism_dict[eps]
             except KeyError:
                 pass
@@ -41,8 +40,7 @@ class Optimized_Randomized_Response(Privacy_Mechanism):
         self.__mechanism = self.optimizer.get_mechanism(eps=eps)
         
         self.__mechanism_dict[eps] = self.__mechanism
-        # print(self.__mechanism)
         return self.__mechanism
 
     def get_name(self):
-        return "Optimised Random Response"
+        return "Optimized Random Response"

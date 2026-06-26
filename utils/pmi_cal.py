@@ -1,9 +1,19 @@
 import pickle
 import os
+from pathlib import Path
+
+CURRENT_DIR = Path.cwd()
+
+if CURRENT_DIR.name == "notebooks":
+    PROJECT_ROOT = CURRENT_DIR.parent
+else:
+    PROJECT_ROOT = CURRENT_DIR
+
+FILE_LOCATION = f'{PROJECT_ROOT}/saved_metadata'
+
 from utils.mutual_information import pointwise_mutual_information
 from utils.cmf_pmf_cal import get_cmf_pmf_dict_with_alphabet
 
-FILE_LOCATION = f'{os.getcwd()}/saved_metadata'
 
 def get_pmi_dict(data):
     

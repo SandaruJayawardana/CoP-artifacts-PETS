@@ -1,8 +1,16 @@
 import numpy as np
 import pickle
 import os
+from pathlib import Path
 
-FILE_LOCATION = f'{os.getcwd()}/saved_metadata'
+CURRENT_DIR = Path.cwd()
+
+if CURRENT_DIR.name == "notebooks":
+    PROJECT_ROOT = CURRENT_DIR.parent
+else:
+    PROJECT_ROOT = CURRENT_DIR
+
+FILE_LOCATION = f'{PROJECT_ROOT}/saved_metadata'
 
 def list_to_string(l):
     s = ""

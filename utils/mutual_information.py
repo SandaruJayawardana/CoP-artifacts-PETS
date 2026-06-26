@@ -1,5 +1,33 @@
 import numpy as np
-from utils.cmf_pmf_cal import get_ordered_alphabet_
+
+def pmi_empirical(X_k_alphabet, X_l_alphabet, pmf):
+    probability_dist = np.zeros((len(X_k_alphabet), len(X_l_alphabet)))
+
+    for index_xk, _ in enumerate(X_k_alphabet):
+        for index_xl, _ in enumerate(X_l_alphabet):
+            probability_dist[index_xk][index_xl] += pmf[index_xk][index_xl]
+            
+    probability_dist /= np.sum(probability_dist)
+    pmi_xk_xl = np.transpose(np.transpose(probability_dist/np.sum(probability_dist, axis=0))/np.sum(probability_dist, axis=1))
+    
+    return np.log2(pmi_xk_xl)
+
+def pointwise_mutual_information(PMF_dict, COLUMNS, alphabet_dict):
+    original_pmi_dict = {}
+    for i in COLUMNS[:]: 
+        X_k_alphabet = alphabet_dict[i]
+        
+        for j in COLUMNS[:]:
+            if i == j:
+                continue
+
+            X_l_alphabet = alphabet_dict[j]
+
+            key_ = str(i) + ' ' + str(j)
+            pmf = PMF_dict[key_]
+            original_pmi_dict[key_] = pmi_empirical(X_k_alphabet=X_k_alphabet, X_l_alphabet=X_l_alphabet, pmf=pmf)
+
+    return original_pmi_dict
 
 """function infocontent(p)
 Computes the Shannon information content for an outcome x of a random variable
@@ -18,38 +46,6 @@ Distributed under GNU General Public License v3
 def infocontent(p):
 
     return -np.log2(p)
-
-def pmi_empirical(X_k_alphabet, X_l_alphabet, pmf):
-    probability_dist = np.zeros((len(X_k_alphabet), len(X_l_alphabet)))
-
-    for index_xk, xk in enumerate(X_k_alphabet):
-        for index_xl, xl in enumerate(X_l_alphabet):
-            probability_dist[index_xk][index_xl] += pmf[index_xk][index_xl]
-            
-    probability_dist /= np.sum(probability_dist)
-    pmi_xk_xl = np.transpose(np.transpose(probability_dist/np.sum(probability_dist, axis=0))/np.sum(probability_dist, axis=1))
-    
-    return np.log2(pmi_xk_xl)
-
-def pointwise_mutual_information(PMF_dict, COLUMNS, alphabet_dict):
-    original_pmi_dict = {}
-    for i in COLUMNS[:]: 
-        X_k_alphabet = alphabet_dict[i] # get_ordered_alphabet_(X_k)
-        
-        for j in COLUMNS[:]:
-            if i == j:
-                continue
-
-            X_l_alphabet = alphabet_dict[j] # get_ordered_alphabet_(X_l)
-
-            key_ = str(i) + ' ' + str(j)
-            pmf = PMF_dict[key_]
-            # print("key", key_, pmf)
-            # key_ = str(i) + ' ' + str(j)
-            original_pmi_dict[key_] = pmi_empirical(X_k_alphabet=X_k_alphabet, X_l_alphabet=X_l_alphabet, pmf=pmf)
-
-    return original_pmi_dict
-
 
 """function entropy(p)
 Computes the Shannon entropy for a probability distribution p.

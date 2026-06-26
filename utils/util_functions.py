@@ -11,14 +11,6 @@ def validate_perturbed_data(original_len, COLUMNS, perturbed_data_list):
         assert perturbed_data_list[i].shape[0] % original_len == 0, f"Length not match with original: original {original_len}, found {perturbed_data_list[i].shape[0]}."
         assert set(perturbed_data_list[i].columns).issubset(COLUMNS), f"Attributes in i={i} = {set(perturbed_data_list[i].columns)} does not subset of {COLUMNS}."
 
-def _0_1_cal(actual, perturbed):
-    N = len(actual)
-    loss = 0
-    for i_index, i in enumerate(actual):
-        if i != perturbed[i_index]:
-            loss += 1
-    return loss/(N)
-
 def validate_err_matrix(err_matrix, dim):
 
     if not(isinstance(err_matrix, np.ndarray) and err_matrix.ndim == 2):
@@ -29,9 +21,6 @@ def validate_err_matrix(err_matrix, dim):
     if np.all(np.diag(err_matrix) != np.zeros(dim)):
         print("dim ", dim)
         assert False, f"Digonal needs to be zero. But found {np.diag(err_matrix)}"
-
-    # if np.max(err_matrix) > 1:
-    #     assert False, f"Matrix should be between 0 and 1. But found {np.max(err_matrix)}"
 
     if np.min(err_matrix) < 0:
         assert False, f"Matrix should be between 0 and 1. But found {np.min(err_matrix)}"
@@ -55,27 +44,3 @@ def validate_alphabet(alphabet):
     if len(alphabet) != len(set(alphabet)):
         assert False, "Alphabet should contain unique elements"
     return True
-
-def cal_tv(p, q):
-    sum_ = np.sum(np.abs(p - q))
-    return sum_/2
-
-def divide_range_into_slices(start, end, num_slices):
-    slice_size = (end - start) / num_slices
-    slices = [start + i*slice_size for i in range(num_slices)]
-    slices.append(end)
-    return slices
-
-def list_to_string(l):
-    s = ""
-    for i in l:
-        s += str(i) + " "
-    return s
-
-def string_to_list(s):
-    __l = s.split(" ")
-    l = []
-    for i in __l:
-        if i != "" :
-            l.append((i))
-    return l

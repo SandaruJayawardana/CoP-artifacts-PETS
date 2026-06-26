@@ -1,11 +1,21 @@
 import pickle
-import os
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
+from pathlib import Path
+
+CURRENT_DIR = Path.cwd()
+
+if CURRENT_DIR.name == "notebooks":
+    PROJECT_ROOT = CURRENT_DIR.parent
+else:
+    PROJECT_ROOT = CURRENT_DIR
+
+FILE_LOCATION = f'{PROJECT_ROOT}/saved_metadata'
+
 from utils.mutual_information import mutualinformationempirical, entropyempirical
 
-FILE_LOCATION = f'{os.getcwd()}/saved_metadata'
+FILE_LOCATION = f'{PROJECT_ROOT}/saved_metadata'
 
 def get_mi_dict(COLUMNS, data):
 
