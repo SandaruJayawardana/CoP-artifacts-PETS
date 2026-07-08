@@ -1,6 +1,6 @@
 # Artifact Appendix
 
-## Paper
+## 1. Paper
 
 **Title:** CoP: Coordinated Perturbation for Controlled Disclosure Under Local Differential Privacy
 
@@ -10,7 +10,7 @@
 
 **License:** Apache License 2.0
 
-## 1. Overview
+## 2. Overview
 
 This artifact provides the implementation of the **CoP perturbation pipeline** proposed in the paper.
 
@@ -23,7 +23,23 @@ The artifact focuses on:
 
 This artifact is not intended to reproduce every figure or full-scale experiment in the paper. Instead, it supports the core implementation of the CoP mechanism and demonstrates how the perturbation pipeline operates.
 
-## 2. Artifact Scope
+## 3. Security/Privacy Issues and Ethical Concerns
+
+The artifact does not disable security mechanisms, execute vulnerable code,
+perform attacks on external systems, or require elevated system privileges.
+
+The provided smoke test uses a small dummy dataset and does not contain
+personal or sensitive information.
+
+Users who apply the implementation to their own datasets are responsible for
+handling those datasets according to applicable privacy, ethical, and licensing
+requirements.
+
+The artifact executes standard Python packages and optimization software. As
+with any third-party software environment, users should review the provided
+source code, `requirements.txt`, and `Dockerfile` before execution.
+
+## 4. Artifact Scope
 
 The artifact includes:
 
@@ -40,7 +56,17 @@ The artifact does not include:
 * all plotting scripts;
 * raw third-party datasets, if redistribution is restricted by their original licenses.
 
-## 3. Repository Structure
+## 5. Accessibility
+
+The artifact is publicly available from the following GitHub repository:
+
+https://github.com/SandaruJayawardana/CoP-artifacts-PETS
+
+The source code is released under the Apache License 2.0.
+
+During artifact evaluation, the latest version of the main branch should be used. A stable version of the evaluated artifact can be retained using the final repository state, release, tag, or commit after the evaluation process is completed.
+
+## 6. Repository Structure
 
 The repository is organized as follows.
 
@@ -77,9 +103,9 @@ The repository is organized as follows.
     └── util_functions.py
 ```
 
-## 4. Main Components
+## 7. Main Components
 
-### 4.1 CoP mechanism
+### 7.1 CoP mechanism
 
 The main CoP implementation is in:
 
@@ -98,7 +124,7 @@ This file implements the CoP perturbation mechanism. The mechanism takes as inpu
 
 The mechanism first constructs optimized perturbation mechanisms for selected dependent attribute pairs. It then perturbs each input record by randomly selecting an unvisited attribute and traversing the selected dependency structure to generate coordinated perturbed outputs.
 
-### 4.2 Multithreaded CoP mechanism
+### 7.2 Multithreaded CoP mechanism
 
 The optional multithreaded version is in:
 
@@ -108,7 +134,7 @@ mechanisms/CoP/cop_multi_thread.py
 
 This version constructs CoP mechanisms in parallel across attributes. It is useful for larger attribute sets but is not required for the smoke test.
 
-### 4.3 Optimized randomized response
+### 7.3 Optimized randomized response
 
 The optimized randomized-response mechanism is in:
 
@@ -118,7 +144,7 @@ mechanisms/CoP/optimized_rr.py
 
 This component constructs a local perturbation matrix for a given privacy budget. It is used internally by CoP when generating attribute-specific perturbation mechanisms.
 
-### 4.4 Convex optimizer
+### 7.4 Convex optimizer
 
 The optimizer is in:
 
@@ -128,7 +154,7 @@ mechanisms/CoP/convex_optimizer.py
 
 This component uses CVXPY to solve the optimization problem used to construct the optimized local perturbation matrix.
 
-### 4.5 Perturbation notebook
+### 7.5 Perturbation notebook
 
 The perturbation notebook is in:
 
@@ -138,7 +164,7 @@ notebooks/cop_perturb.ipynb
 
 This notebook demonstrates the CoP perturbation pipeline interactively.
 
-## 5. Hardware Requirements
+## 8. Hardware Requirements
 
 The artifact does not require a GPU.
 
@@ -153,7 +179,7 @@ GPU: Not required
 
 For larger datasets or larger attribute alphabets, more memory and CPU cores may reduce runtime.
 
-## 6. Software Requirements
+## 9. Software Requirements
 
 The artifact was developed for Python 3.
 
@@ -180,11 +206,11 @@ pip install -r requirements.txt
 
 The artifact uses CVXPY with the HiGHS solver for the optimization step.
 
-## 7. Installation
+## 10. Installation
 
 The artifact can be installed either using a local Python virtual environment or using Docker.
 
-### 7.1 Option A: Local Installation
+### 10.1 Option A: Local Installation
 
 Clone the repository:
 
@@ -207,7 +233,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-### 7.2 Option B: Docker Installation
+### 10.2 Option B: Docker Installation
 
 We also provide a Dockerfile to support a reproducible build environment for artifact evaluation. The Docker image installs the required Python dependencies, notebook execution tools, and HiGHS solver support.
 
@@ -242,7 +268,7 @@ notebooks/cop_dummy_pipeline.ipynb
 
 The volume mount `-v "$PWD:/artifact"` connects the local repository folder to `/artifact` inside Docker. Therefore, any results written to `/artifact/results/` inside Docker will also appear in the local `results/` folder.
 
-## 8. Input Format
+## 11. Input Format
 
 The CoP perturbation pipeline requires a multidimensional categorical dataset. Each row corresponds to one user record, and each column corresponds to one attribute.
 
@@ -254,7 +280,7 @@ datasets/dummy.csv
 
 The notebook automatically loads the dataset, extracts the attribute list, estimates dependency information, initializes the CoP mechanism, and evaluates the perturbed outputs.
 
-### 8.1 Attribute List
+### 11.1 Attribute List
 
 The attribute list specifies the order of attributes used by the mechanism. In the smoke-test notebook, this list is obtained directly from the input dataset:
 
@@ -270,7 +296,7 @@ ordered_attribute_list = ["A", "B", "C"]
 
 The order of attributes is important because input records and perturbed output records follow this same order.
 
-### 8.2 Attribute Alphabets
+### 11.2 Attribute Alphabets
 
 The alphabet of an attribute is the set of possible values that the attribute can take. The smoke-test notebook estimates the attribute alphabets from the dataset:
 
@@ -283,7 +309,7 @@ CMF_dict, alphabet_dict = get_cmf_pmf_dict_with_alphabet(
 
 Here, `alphabet_dict` maps each attribute to its possible values.
 
-### 8.3 Dependency Information
+### 11.3 Dependency Information
 
 CoP uses prior dependency information to coordinate perturbation across attributes. In the smoke-test notebook, this information is estimated from the input data:
 
@@ -310,7 +336,7 @@ cop_mechanism = CoP_Mechanism(
 )
 ```
 
-## 9. Running the Smoke Test (Execution time: ~2mins)
+## 12. Running the Smoke Test (5–10 human-minutes and approximately 2 compute-minutes)
 
 The smoke test checks that the CoP mechanism can be constructed and used to perturb a small dummy dataset. It also validates the generated perturbed datasets and evaluates their utility.
 
@@ -320,7 +346,7 @@ The smoke-test notebook is located at:
 notebooks/cop_dummy_pipeline.ipynb
 ```
 
-### 9.1 Run Locally
+### 12.1 Run Locally
 
 After completing the local installation, run:
 
@@ -340,7 +366,7 @@ jupyter nbconvert \
   --output-dir results
 ```
 
-### 9.2 Run with Docker
+### 12.2 Run with Docker
 
 After building the Docker image (without running `docker run --rm -it cop-artifact`), execute the notebook inside Docker using:
 
@@ -358,7 +384,7 @@ docker run --rm -it \
 
 This command writes the executed notebook and generated outputs to the local `results/` directory.
 
-### 9.3 Smoke-Test Steps
+### 12.3 Smoke-Test Steps
 
 The smoke test performs the following steps:
 
@@ -373,7 +399,7 @@ The smoke test performs the following steps:
 9. validates that the perturbed datasets have the expected format;
 10. evaluates the perturbed datasets against the original data.
 
-### 9.4 Expected Outputs
+### 12.4 Expected Outputs
 
 After successful execution, the `results/` directory should contain perturbed datasets such as:
 
@@ -405,16 +431,59 @@ The expected plot is:
 MSE vs Privacy Budget
 ```
 
-## 10. License
+## 13. Limitations
+
+This artifact is submitted for the **Available** and **Functional** badges only. The **Reproduced** badge is not requested.
+
+The artifact is not intended to reproduce the complete experimental evaluation reported in the paper. In particular, it does not include:
+
+* the full paper-scale experimental workflows;
+* all baseline mechanisms used in the paper;
+* scripts for reproducing every paper figure and table;
+* all large-scale attribute-inference experiments;
+* all plotting and result-aggregation scripts; or
+* raw third-party datasets whose redistribution may be restricted by their original licenses.
+
+The provided smoke test uses a small dummy dataset and is intended to verify the functionality of the core CoP implementation rather than reproduce the paper's numerical results.
+
+Therefore, numerical values produced by the smoke test should not be directly compared with the quantitative results reported in the paper.
+
+## 14. Notes on Reusability
+
+The CoP implementation can be adapted to other multidimensional categorical datasets.
+
+To use another dataset, users can replace the dummy input with a compatible tabular dataset in which:
+
+* each row represents one record;
+* each column represents one categorical attribute; and
+* attribute values can be converted into finite categorical alphabets.
+
+The provided utilities can be used to estimate:
+
+* attribute alphabets;
+* conditional probability information;
+* mutual information; and
+* pointwise mutual information.
+
+Researchers can also adapt the implementation by:
+
+* changing the privacy budgets;
+* changing dependency-selection thresholds;
+* replacing the dependency information with externally estimated prior knowledge;
+* using different categorical datasets; or
+* integrating the CoP implementation into a larger local differential privacy evaluation pipeline.
+
+## 15. License
 
 The source code is released under the Apache License 2.0.
 
-Datasets are subject to their original licenses. If raw datasets cannot be redistributed, the repository provides instructions for preparing compatible input files.
+Datasets remain subject to their original licenses.
 
-## 11. Contact
+## 16. Contact
 
 For questions about this artifact, contact:
 
 ```text
-Sandaru Jayawardana (sjay9734@uni.sydney.edu.au)
+Sandaru Jayawardana
+sjay9734@uni.sydney.edu.au
 ```
